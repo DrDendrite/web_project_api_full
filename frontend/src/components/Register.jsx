@@ -25,23 +25,21 @@ function Register({ title, nameBtn }) {
     setOpen(true);
   };
 
-  const onRegister = (evt) => {
+  const onRegister = async (evt) => {
     evt.preventDefault();
-
-    auth
-      .register(credentials.password, credentials.email)
-      .then((res) => {
-        localStorage.setItem("token", res.token);
-        navigate("/signin", { state: "success" });
-      })
-      .catch((err) => {
-        console.error({
-          message: "Error creando el usuario",
-          detail: err.message,
-        });
-        setError(true);
-        setOpen(false);
+  
+    try {
+      const res = await auth.register(credentials.password, credentials.email);
+      localStorage.setItem("token", res.token);
+      navigate("/signin", { state: "success" });
+    } catch (err) {
+      console.error({
+        message: "Error creando el usuario",
+        detail: err.message,
       });
+      setError(true);
+      setOpen(false);
+    }
   };
 
   return (
