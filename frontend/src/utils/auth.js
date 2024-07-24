@@ -1,62 +1,68 @@
-//const BASE_URL = "api.dendriteprojectaround.ignorelist.com";
-
-const BASE_URL = "http://localhost:3000";
-
-export const register = async (password, email) => {
-  try {
-    const response = await fetch(`${BASE_URL}/signup`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ password, email }),
+const base_url ="api.dendriteprojectaround.ignorelist.com";
+export const register = (email, password) => {
+  console.log('register auth:', { email, password });
+  return fetch(`${base_url}/signup`, {
+    method: 'POST',
+    headers: {
+      Accept: 'application/json',
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      email,
+      password
+    }),
+  })
+    .then((res) => {
+      if (res.ok) {
+        return res.json();
+      }else {
+      return Promise.reject(res.status);}
+    })
+    .catch((error) => {
+      console.log(`Error: ${error}`);
     });
-
-    if (!response.ok) {
-      throw new Error(`Error al registrarse: ${response.status}`);
-    }
-
-    const data = await response.json();
-    return data;
-  } catch (err) {
-    throw new Error(`Error en la solicitud de registro: ${err.message}`);
-  }
 };
 
-export const authorize = (password, email) => {
-  return fetch(`${BASE_URL}/signin`, {
-    method: "POST",
+export const authorize = (email, password) => {
+  return fetch(`${base_url}/signin`, {
+    method: 'POST',
     headers: {
-      "Content-Type": "application/json",
+      Accept: 'application/json',
+      'Content-Type': 'application/json',
     },
-    body: JSON.stringify({ password, email }),
+
+    body: JSON.stringify({ email, password }),
   })
-    .then((response) => {
-      return response.json();
-    })
-    .then((credentials) => {
-      if (credentials.token) {
-        localStorage.setItem("token", credentials.token);
-        return credentials;
+    .then((res) => res.json())
+    .then((data) => {
+      if (data.token) {
+        localStorage.setItem('token', data.token);
+        console.log('token autorize', data.token)
+        return data;
+      } else {
+        return;
       }
     })
+
     .catch((err) => {
-      console.log(err);
+      return console.log(`Error: ${err}`);
     });
 };
 
-export const checkToken = (token) => {
-  return fetch(`${BASE_URL}/users/me`, {
-    method: "GET",
+export const getToken = (token) => {
+  return fetch(`${base_url}/users/me`, {
+    method: 'GET',
     headers: {
-      "Content-Type": "application/json",
+      'Content-Type': 'application/json',
       Authorization: `Bearer ${token}`,
     },
   })
-    .then((res) => {
-      return res.json();
+    .then((res) => res.json())
+    .then((data) => {
+      console.log("auth Token", data)
+      return data;
     })
     .catch((err) => {
-      console.log(err);
+      return console.log(`Error: ${err}`);
     });
 };

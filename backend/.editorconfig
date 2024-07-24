@@ -6,11 +6,11 @@
 root = true
 
 [*]
-# Estilo de sangría
+# Estilo de indentación
 # Valores posibles: tabulación, espacio
 indent_style = space
 
-# Tamaño de la sangría en caracteres de un solo espacio
+# Tamaño de la indentación en caracteres de un solo espacio
 # Valores posibles: un entero, tabulación
 indent_size = 2
 

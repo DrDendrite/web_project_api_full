@@ -1,48 +1,43 @@
 import Profile from "./Profile";
-import { useContext } from "react";
-import { CurrentUserContext } from "../contexts/CurrentUserContext.js";
 import Card from "./Card.js";
+import {  useContext } from "react";
+import { CurrentUserContext } from "../contexts/CurrentUserContext";
 
 function Main({
+  onEditAvatarClick,
   onEditProfileClick,
   onAddPlaceClick,
-  onEditAvatarClick,
-  onCardClick,
-  onCardLike,
-  onCardDelete,
-  cards,
+  onCardClick,onCardLike,
+  onCardDelete,cards
 }) {
   const currentUser = useContext(CurrentUserContext);
 
   return (
-    <main className="content">
-      <Profile
-        userName={currentUser && currentUser.name}
-        userAbout={currentUser && currentUser.about}
-        userAvatar={currentUser && currentUser.avatar}
-        onEditAvatarClick={onEditAvatarClick}
-        onEditProfileClick={onEditProfileClick}
-        onAddPlaceClick={onAddPlaceClick}
-      />
-        //**renderizado de cards **//
-      <section className="card-elements">
-        {Array.isArray(cards) &&
-          cards.map((card) => {
-            return (
-              <Card
-                key={card._id}
-                name={card.name}
-                link={card.link}
-                likes={card.likes}
-                onCardClick={() => onCardClick(card)}
-                onCardLike={() => onCardLike(card)}
-                onCardDelete={() => onCardDelete(card)}
-                owner={card.owner}
+    <>
+      <main>
+        <Profile
+          onEditAvatarClick={onEditAvatarClick}
+          onEditProfileClick={onEditProfileClick}
+          onAddPlaceClick={onAddPlaceClick}
+          currentUser={currentUser}
+        ></Profile>
+        <section className="places" id="places">
+          {
+            cards.map((card,i)=>(
+              <Card 
+              key={`card-${i}`}
+              card={card}
+              id={`card-${i}`}
+              onCardClick={onCardClick}
+              onCardLike={onCardLike}
+              onCardDelete={onCardDelete}
               />
-            );
-          })}
-      </section>
-    </main>
+            ))
+          }
+          
+        </section>
+      </main>
+    </>
   );
 }
 

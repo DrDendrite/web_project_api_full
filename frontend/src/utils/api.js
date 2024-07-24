@@ -1,138 +1,93 @@
-//const BASE_URL = "api.dendriteprojectaround.ignorelist.com";
-
-const BASE_URL = "http://localhost:3000";
-
-
 class Api {
-  constructor({ address }) {
-    this._address = address;
-    this._token = localStorage.getItem("token");
+  constructor({ baseUrl, headers }) {
+    this._baseUrl = baseUrl;
+    this._headers = headers;
   }
 
-  async _useFetch(url, method, body) {
-    const res = await fetch(url, {
-      headers: {
-        Authorization: "Bearer " + this._token,
-        "Content-Type": "application/json",
-      },
-      method,
-      body: JSON.stringify(body),
-    });
-
+  _checkResponse(res) {
     if (res.ok) {
       return res.json();
     }
-
-    return Promise.reject(`Error ${res.status}`);
+    return Promise.reject(`Error: ${res.status}`);
   }
 
-  async getUserInfoFromServer() {
-    try {
-      const res = await this._useFetch(this._address + "/users/me", "GET");
-
-      return res;
-    } catch (err) {
-      console.log(err);
-    }
+  defaultProfile(token) {
+    return fetch(`${this._baseUrl}/users/me`, {
+      headers: this._getAuthHeaders(),
+    }).then(this._checkResponse);
   }
 
-  async getCards() {
-    try {
-      const res = await this._useFetch(this._address + "/cards", "GET");
-      return res;
-    } catch (err) {
-      console.log(err);
-    }
+  getCards(token) {
+    return fetch(`${this._baseUrl}/cards`, {
+      headers: this._getAuthHeaders(),
+    }).then(this._checkResponse);
   }
 
-  async saveDataToServer(name, about) {
-    try {
-      const res = await this._useFetch(this._address + "/users/me", "PATCH", {
-        name,
-        about,
-      });
-
-      return res;
-    } catch (err) {
-      console.log(err);
-    }
+  addCards(data) {
+    return fetch(`${this._baseUrl}/cards`, {
+      method: "POST",
+      headers: this._getAuthHeaders(),
+      body: JSON.stringify(data),
+    }).then(this._checkResponse);
   }
 
-  async addNewCardToServer(name, link) {
-    try {
-      const res = await this._useFetch(this._address + "/cards", "POST", {
-        name: name,
-        link: link,
-      });
-
-      return res;
-    } catch (err) {
-      console.log(err);
-    }
+  updateAvatar(data) {
+    return fetch(`${this._baseUrl}/users/me/avatar`, {
+      method: "PATCH",
+      headers: this._getAuthHeaders(),
+      body: JSON.stringify(data),
+    }).then(this._checkResponse);
   }
 
-  async deleteCardFromServer(cardId) {
-    try {
-      const res = await this._useFetch(
-        `${this._address}/cards/${cardId}`,
-        "DELETE"
-      );
-
-      return res;
-    } catch (err) {
-      console.log(err);
-    }
+  updateProfile(data) {
+    return fetch(`${this._baseUrl}/users/me`, {
+      method: "PATCH",
+      headers: this._getAuthHeaders(),
+      body: JSON.stringify(data),
+    }).then(this._checkResponse);
   }
 
-  async addLikeFromCard(cardId) {
-    try {
-      const res = await this._useFetch(
-        `${this._address}/cards/${cardId}/likes`,
-        "PUT"
-      );
-
-      return res;
-    } catch (err) {
-      console.log(err);
-    }
+  addLike(cardId) {
+    return fetch(`${this._baseUrl}/cards/${cardId}/likes`, {
+      method: "PUT",
+      headers: this._getAuthHeaders(),
+    }).then(this._checkResponse);
   }
 
-  async deleteLikeFromCard(cardId) {
-    try {
-      const res = await this._useFetch(
-        `${this._address}/cards/${cardId}/likes`,
-        "DELETE"
-      );
-
-      return res;
-    } catch (err) {
-      console.log(err);
-    }
+  deleteLike(cardId) {
+    return fetch(`${this._baseUrl}/cards/${cardId}/likes`, {
+      method: "DELETE",
+      headers: this._getAuthHeaders(),
+    }).then(this._checkResponse);
   }
 
-  async updateAvatar(avatarUrl) {
-    try {
-      if (typeof avatarUrl === "string" && /^https?:\/\/\S+$/.test(avatarUrl)) {
-        const res = await this._useFetch(
-          this._address + "/users/me/avatar",
-          "PATCH",
-          {
-            avatar: avatarUrl,
-          }
-        );
-
-        return res;
-      } else {
-        throw new Error("La URL del avatar no es válida");
-      }
-    } catch (err) {
-      console.log(err);
+  deleteCard(cardId) {
+    return fetch(`${this._baseUrl}/cards/${cardId}`, {
+      method: "DELETE",
+      headers: this._getAuthHeaders(),
+    }).then(this._checkResponse);
+  }
+  
+  _getAuthHeaders() {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      return this._headers;  // Return the headers without Authorization if no token is found
     }
+    return {
+      ...this._headers,
+      'Authorization': `Bearer ${token}`,
+    };
   }
 }
 
-const api = new Api({
-  address: BASE_URL,
+const base_url ="api.dendriteprojectaround.ignorelist.com";
+
+
+export const api = new Api({
+  baseUrl: base_url,
+  headers: {
+    'Content-Type': 'application/json',
+  },
 });
 
 export default api;

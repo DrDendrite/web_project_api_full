@@ -1,37 +1,56 @@
 const express = require('express');
+const { errors } = require('celebrate');
+const users = require('./routes/users');
+const cards = require('./routes/cards');
 const mongoose = require('mongoose');
-const cors = require('cors');
-
-const usersRoute = require('./routes/users');
-const cardsRoute = require('./routes/cards');
-
-const { login, createUser } = require('./controllers/users');
-const auth = require('./middlewares/auth');
-
-const { HttpStatus, HttpResponseMessage } = require('./enums/http');
-
-const {
-  loginValidator,
-  signUpValidator,
-} = require('./models/validationSchemas');
-
-//celebrate validator
-const { celebrate, errors } = require('celebrate');
-
-//logger
-const { logRequest, errorLogger } = require('./middlewares/logger');
-
-const { PORT = 3000 } = process.env;
+const bodyParser = require('body-parser');
+const { login, createUser } = require('./controllers/user');
+const { requestLogger, errorLogger } = require("./middlewares/logger.js");
+const {jwtMiddleware} = require('./middlewares/auth.js')
+const {celebrate,Joi} = require('celebrate');
+require("dotenv").config();
 
 const app = express();
+const{PORT = 3000 } = process.env;
+mongoose.connect('mongodb://127.0.0.1:27017/aroundb');
 
-app.use(cors());
+const db = mongoose.connection;
 
-app.use(express.json());
+db.on('error', console.error.bind(console, 'MongoDB connection error:'));
+db.once('open', () => {
+  console.log('Connected to MongoDB');
+});
+var cors = require('cors');
+const allowedOrigins = ['http://localhost:3000', 'http://api.dendriteprojectaround.ignorelist.com'];
+// inclúyelos antes de otras rutas
+const corsOptions = {
+  origin: function (origin, callback) {
+    // Permite solicitudes con origen undefined (p. ej., aplicaciones móviles)
+    if (!origin) return callback(null, true);
+    if (allowedOrigins.indexOf(origin) === -1) {
+      const msg = 'El CORS policy para este sitio no permite acceso desde el origen especificado.';
+      return callback(new Error(msg), false);
+    }
+    return callback(null, true);
+  },
+  methods: ['GET', 'POST','PATCH', 'PUT', 'DELETE', 'OPTIONS'], // Allow these HTTP methods
+  allowedHeaders: ['Content-Type', 'Authorization'], // Allow these headers
+  credentials: true // Allow credentials if needed
+};
 
-mongoose.connect('mongodb://localhost:27017/aroundb');
+app.use(cors(corsOptions));
 
-app.use(logRequest);
+app.use(requestLogger);
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
+
+app.post('/signin', login);
+app.post('/signup', createUser);
+app.use(jwtMiddleware)
+
+
+app.use('/users' ,users);
+app.use('/cards' ,cards);
 
 app.get('/crash-test', () => {
   setTimeout(() => {
@@ -39,39 +58,18 @@ app.get('/crash-test', () => {
   }, 0);
 });
 
-app.post(
-  '/signin',
-  celebrate({
-    body: loginValidator,
-  }),
-  login,
-);
 
-app.post('/signup', celebrate({ body: signUpValidator }), createUser);
 
-app.use(auth);
-
-app.use('/', cardsRoute);
-app.use('/', usersRoute);
-
+app.use(errorLogger);
+// Middleware de manejo de errores de celebrate
 app.use(errors());
 
-app.use((err, req, res, next) => {
-  console.error(err.stack);
 
-  errorLogger.error(err.message);
-
-  res
-    .status(HttpStatus.INTERNAL_SERVER_ERROR)
-    .json({ message: HttpResponseMessage.SERVER_ERROR });
-});
-
+// Ruta por defecto: devuelve un mensaje de error para cualquier otra ruta
 app.use((req, res) => {
-  res
-    .status(HttpStatus.NOT_FOUND)
-    .json({ message: HttpResponseMessage.NOT_FOUND });
+  res.status(404).json({ message: 'Recurso solicitado no encontrado' });
 });
 
-app.listen(PORT, () => {
-  console.log(`App listening at port ${PORT}`);
+app.listen(PORT,()=>{
+  console.log(` Servidor en ejecución en http://localhost:${PORT}`);
 });

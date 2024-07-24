@@ -1,11 +1,8 @@
-import React from "react";
-
-function Footer() {
-  return (
+function Footer (){
+  return(
     <footer className="footer">
-      <h3 className="footer__copyright">© DrDendrite 2024 Around The U.S.</h3>
-    </footer>
-  );
+          <h4 className="footer__copyright">© 2021 Alrededor de los EEUU</h4>
+        </footer>
+  )
 }
-
 export default Footer;
