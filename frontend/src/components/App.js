@@ -179,7 +179,7 @@ function App() {
                 });
             } else {
               console.error("El token no es valido:");
-              localStorage.removeItem("token");
+              //*localStorage.removeItem("token");
               navigate("/signin");
             }
           })

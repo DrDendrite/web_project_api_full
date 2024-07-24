@@ -1,4 +1,6 @@
-const BASE_URL = "api.dendriteprojectaround.ignorelist.com";
+//const BASE_URL = "api.dendriteprojectaround.ignorelist.com";
+
+const BASE_URL = "http://localhost:3000";
 
 
 class Api {
