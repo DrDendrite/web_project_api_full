@@ -21,7 +21,7 @@ db.once('open', () => {
   console.log('Connected to MongoDB');
 });
 var cors = require('cors');
-const allowedOrigins = ['http://localhost:3000', 'api.dendriteprojectaround.ignorelist.com'];
+const allowedOrigins = [ 'api.dendriteprojectaround.ignorelist.com'];
 // inclúyelos antes de otras rutas
 const corsOptions = {
   origin: function (origin, callback) {
