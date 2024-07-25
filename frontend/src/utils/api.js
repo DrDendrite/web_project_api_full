@@ -81,7 +81,6 @@ class Api {
 }
 
 const base_url ="http://api.dendriteprojectaround.ignorelist.com";
-//const base_url ="http://localhost:8001";
 
 export const api = new Api({
   baseUrl: base_url,

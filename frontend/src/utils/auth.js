@@ -1,4 +1,3 @@
-//const base_url = 'http://localhost:8001';
 const base_url ="http://api.dendriteprojectaround.ignorelist.com";
 export const register = (email, password) => {
   console.log('register auth:', { email, password });
