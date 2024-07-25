@@ -11,7 +11,7 @@ const {celebrate,Joi} = require('celebrate');
 require("dotenv").config();
 
 const app = express();
-const{PORT = 3000 } = process.env;
+const{PORT = 3001 } = process.env;
 mongoose.connect('mongodb://127.0.0.1:27017/aroundb');
 
 const db = mongoose.connection;
@@ -21,7 +21,7 @@ db.once('open', () => {
   console.log('Connected to MongoDB');
 });
 var cors = require('cors');
-const allowedOrigins = [ 'api.dendriteprojectaround.ignorelist.com'];
+const allowedOrigins = ['http://localhost:3000', 'api.dendriteprojectaround.ignorelist.com'];
 // inclúyelos antes de otras rutas
 const corsOptions = {
   origin: function (origin, callback) {
