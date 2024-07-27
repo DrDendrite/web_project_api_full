@@ -1,102 +1,72 @@
-import { useState,useContext,useEffect } from "react";
-import {CurrentUserContext} from "../contexts/CurrentUserContext"
+import React, { useContext, useState } from "react";
 import PopupWithForm from "./PopupWithForm";
-function EditProfilePopup({isOpen,onClose,onUpdateUser}) {
+import Input from "./Input";
+import { CurrentUserContext } from "../contexts/CurrentUserContext";
 
+function EditProfilePopup({ isOpen, onClose, onUpdateUser }) {
   const currentUser = useContext(CurrentUserContext);
-  const [name,setName] = useState("");
-  const [description,setDescription] = useState("");
-  const [isSaveButtonDisabled, setIsSaveButtonDisabled] = useState(true);
-  const [nameError, setNameError] = useState("");
-  const [descriptionError, setDescriptionError] = useState("");
 
+  const [name, setName] = useState(currentUser?.name);
+  const [description, setDescription] = useState(currentUser?.about);
 
-  useEffect(() => {
-    // Reviso que el usuario en el contexto no sea `undefined`
-    if (currentUser.name !== undefined || currentUser.about !== undefined) {
-      setName(currentUser.name || '');
-      setDescription(currentUser.about || '');
+  const handleNameChange = (evt) => {
+    setName(evt.target.value);
+  };
+
+  const handleDescriptionChange = (evt) => {
+    setDescription(evt.target.value);
+  };
+
+  const handleSubmit = () => {
+    if (!name || !description) {
+      alert("Nombre y Profesión Requerido");
+      return;
     }
-  }, [currentUser]);
 
-  useEffect(() => {
-    // Verificar si los campos de entrada están vacíos o no
-    setIsSaveButtonDisabled(!name || !description || name.length < 2 || description.length < 2);
-  }, [name, description]);
-
-  function handleOnChange(evt) {
-    const { name, value } = evt.target;
-    if (name === "name") {
-      setName(value);
-      if (value.length < 2) {
-        setNameError("El nombre debe tener al menos 2 caracteres");
-      } else {
-        setNameError("");
-      }
-    } else {
-      setDescription(value);
-      if (value.length < 2) {
-        setDescriptionError("La descripción debe tener al menos 2 caracteres");
-      } else {
-        setDescriptionError("");
-      }
-    }
-  }
-
-  function handleSubmit(e) {
-    // Evita que el navegador navegue hacia la dirección del formulario
-    e.preventDefault();
-    
-    // Limpiando los inputs
-    setName("");
-    setDescription("");
-    
-    // Pasa los valores de los componentes gestionados al controlador externo
     onUpdateUser({
       name: name,
       about: description,
+    }).then(() => {
+      onClose();
     });
-  }
+  };
 
   return (
-    <PopupWithForm
-      isOpen={isOpen}
-      name={"profile"}
-      title={"Editar perfil"}
-      onClose={onClose}
-    >
-      <form id="form-profile" className="form" onSubmit={handleSubmit} noValidate>
-        <input
-          onChange={handleOnChange}
-          className="form__user-box"
-          id="user-name"
+    <>
+      <PopupWithForm
+        title={"Editar Perfil"}
+        className="popup"
+        id="edit-profile-form"
+        nameBtn="Editar"
+        isOpen={isOpen}
+        onClose={onClose}
+        onSubmit={handleSubmit}
+      >
+        <Input
           type="text"
+          className="popup__container-input"
           placeholder="Nombre"
-          minLength="2"
-          maxLength="40"
-          name="name"
           value={name}
-          required
-        />
-        <span className="user-name-error">{nameError}</span>
-        <input
-          onChange={handleOnChange}
-          className="form__user-box"
-          id="user-about"
+          id="name"
+          maxLength="40"
+          onChange={handleNameChange}
+        >
+          <span className="popup__input-error name-error"></span>
+        </Input>
+
+        <Input
           type="text"
-          placeholder="Acerca de mi"
-          minLength="2"
-          maxLength="200"
-          name="about"
+          className="popup__container-input"
+          placeholder="Profesión"
           value={description}
-          required
-        />
-        <span className="user-about-error">{descriptionError}</span>
-        <button type="submit" className="form__button-submit" disabled={isSaveButtonDisabled}>
-          Guardar
-        </button>
-      </form>
-    </PopupWithForm>
+          id="about-me"
+          maxLength="200"
+          onChange={handleDescriptionChange}
+        >
+          <span className="popup__input-error about-me-error"></span>
+        </Input>
+      </PopupWithForm>
+    </>
   );
 }
 

@@ -3,33 +3,33 @@ const mongoose = require('mongoose');
 const cardSchema = new mongoose.Schema({
   name: {
     type: String,
-    required: true,
     minlength: 2,
-    maxlength: 30
+    maxlength: 30,
+    required: true,
   },
   link: {
     type: String,
-    required: true,
     validate: {
-      validator: function(v) {
-        return /^(http|https):\/\/(www\.)?[\w\-_]+(\.[\w\-_]+)+([\w\-\.,@?^=%&:/~\+#]*[\w\-\@?^=%&/~\+#])?$/.test(v);
+      validator: function (v) {
+        return /^https?:\/\/[\w\-]+(\.[\w\-]+)+[/#?]?.*$/.test(v);
       },
-      message: props => `${props.value} is not a valid link URL!`
-    }
+      message: (props) => `${props.value} is not a valid url!`,
+    },
+    required: true,
   },
   owner: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'User',
-    required: true
+    ref: 'user',
+    required: true,
   },
   likes: {
-    type: [mongoose.Schema.Types.ObjectId],
-    default: []
+    type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'user' }],
+    default: [],
   },
   createdAt: {
     type: Date,
-    default: Date.now
-  }
+    default: Date.now,
+  },
 });
 
 module.exports = mongoose.model('card', cardSchema);

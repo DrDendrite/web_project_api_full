@@ -1,27 +1,33 @@
-import closeIcon from '../images/close-icon.png'
+import React from "react";
+import closeIcon from "../images/close-icon.png";
 
-function ImagePopup({title,image,isOpen,onclose}) {
+function ImagePopup({ selectedCard, onClose }) {
   return (
-    <div id="modal-img" className={`modal ${isOpen ? 'modal__opened' : ''}`}>
-      <div className="modal__contain-img">
+    <section className={`modal ${selectedCard ? "" : "open"}`}>
+      <div onClick={onClose} className="modal__overlay"></div>
+      <div className="modal__container">
         <img
+          className="modal__container-close"
           src={closeIcon}
-          id="close-icon-image"
-          alt="icono de cierre"
-          className="modal__close-icon"
-          onClick={onclose}
+          alt="icon para cerra la
+            imágen"
+          onClick={onClose}
         />
-        <img
-          src={image}
-          id="modal-img-src"
-          className="modal__img"
-          alt={`paisaje ${title}`}
-        />
-        <h4 id="modal-img-title" className="modal__title">
-          {title}
-        </h4>
+
+        {selectedCard && (
+          <>
+            <img
+              className="modal__image-card"
+              src={selectedCard.link}
+              alt={selectedCard.name}
+              id="modal"
+            />
+            <h3 className="modal__title-text"> {selectedCard.name} </h3>
+          </>
+        )}
       </div>
-    </div>
+    </section>
   );
 }
+
 export default ImagePopup;

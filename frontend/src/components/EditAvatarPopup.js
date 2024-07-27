@@ -1,64 +1,62 @@
-import React, { useContext, useRef, useState } from "react";
+import React, { useState } from "react";
 import PopupWithForm from "./PopupWithForm.js";
-import { CurrentUserContext } from "../contexts/CurrentUserContext.js";
+import Input from "./Input.js";
 
 function EditAvatarPopup({ isOpen, onClose, onUpdateAvatar }) {
-  const currentUser = useContext(CurrentUserContext);
-  const avatarRef = useRef(currentUser?.avatar ?? "");
-  const [isButtonDisabled, setIsButtonDisabled] = useState(true);
-  const [errorMessage, setErrorMessage] = useState("");
+  const [avatar, setAvatar] = useState("");
 
-  function isUrlValid(url) {
-    try {
-      new URL(url);
-      return true;
-    } catch (error) {
-      return false;
-    }
-  }
+  const handleChangeAvatar = (evt) => {
+    setAvatar(evt.target.value);
+  };
 
-  function handleSubmit(e) {
-    e.preventDefault();
-    const avatar = avatarRef.current.value;
-    if (isUrlValid(avatar)) {
-      onUpdateAvatar({ avatar:avatar });
-    }
-  }
+  const handleCleanInputOnClose = () => {
+    onClose();
+    setAvatar("");
+  };
 
-  function handleInputChange() {
-    const avatar = avatarRef.current.value;
-    if (!isUrlValid(avatar)) {
-      setErrorMessage("Por favor ingresa una URL válida.");
-    } else {
-      setErrorMessage("");
+  const handleSubmit = () => {
+    if (!avatar) {
+      alert("Campo requerido");
+      return;
     }
-    setIsButtonDisabled(!isUrlValid(avatar));
-  }
+
+    const imageRegex = /\.(jpeg|jpg|gif|png|bmp|svg|webp)$/i;
+
+    if (!imageRegex.test(avatar)) {
+      alert("La URL no es una URL de imagen válida");
+      return;
+    }
+
+    onUpdateAvatar(avatar).then(() => {
+      setAvatar("");
+      onClose();
+    });
+  };
 
   return (
-    <PopupWithForm
-      isOpen={isOpen}
-      name={"avatar"}
-      title={"Foto de perfil"}
-      onClose={onClose}
-    >
-      <form id="form-edit-photo" className="form" onSubmit={handleSubmit} noValidate>
-        <input
-          className="form__user-box"
-          id="edit-photo-avatar"
+    <>
+      <PopupWithForm
+        title={"Cambiar foto de perfil"}
+        className="modal-window"
+        id="change-profile"
+        nameBtn="Guardar"
+        isOpen={isOpen}
+        onClose={handleCleanInputOnClose}
+        onSubmit={handleSubmit}
+        classNameModal="modal-window__change-image"
+      >
+        <Input
           type="url"
-          placeholder="Url para imagen de perfil"
-          name="link"
-          ref={avatarRef}
-          required
-          onChange={handleInputChange}
-        />
-        <span className="edit-photo-avatar-error">{errorMessage}</span>
-        <button type="submit" className="form__button-submit" disabled={isButtonDisabled}>
-          Guardar
-        </button>
-      </form>
-    </PopupWithForm>
+          className="modal-window__input-url-change"
+          placeholder="Título"
+          id="url-change"
+          value={avatar}
+          onChange={handleChangeAvatar}
+        >
+          <span className="url-change-error"></span>
+        </Input>
+      </PopupWithForm>
+    </>
   );
 }
 

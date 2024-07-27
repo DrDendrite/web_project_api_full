@@ -1,35 +1,33 @@
 const jwt = require('jsonwebtoken');
+const { HttpStatus, HttpResponseMessage } = require('../enums/http');
+require('dotenv').config();
 
-module.exports.generateToken = (data) => {
-  console.log('generate token auth back', data)
-  const token = jwt.sign({ _id: data._id }, process.env.JWT_SECRET, { expiresIn: '7d' });
-  console.log('generate token auth back des', token)
-  return token;
+const { JWT_SECRET } = process.env;
+
+const handleError = (res) => {
+  res
+    .status(HttpStatus.UNAUTHORIZED)
+    .send({ message: HttpResponseMessage.UNAUTHORIZED });
 };
 
-module.exports.jwtMiddleware = async (req, res, next) => {
+module.exports = (req, res, next) => {
   const { authorization } = req.headers;
-  if (!authorization || !authorization.startsWith('Bearer ')) {
-    return res
-      .status(403)
-      .send({ message: 'Se requiere autorización' });
+
+  if (!authorization || !authorization.startsWith('Bearer')) {
+    return handleError(res);
   }
 
   const token = authorization.replace('Bearer ', '');
 
-  try {
-    console.log('cliente', token)
-    console.log('servidor', process.env.JWT_SECRET)
-    console.log('resultado', await jwt.verify(token, process.env.JWT_SECRET))
-    const payload = await jwt.verify(token, process.env.JWT_SECRET);
+  let payload;
 
-    if (!payload) {
-      return res.status(403).send({ message: 'El token no es valido' });
-    }
-    req.user = payload;
-    next();
-    return req.user;
+  try {
+    payload = jwt.verify(token, JWT_SECRET);
   } catch (err) {
-    return res.status(403).send({ message: 'El token no es valido' });
+    return handleError(res);
   }
+
+  req.user = payload;
+
+  next();
 };

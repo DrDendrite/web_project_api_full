@@ -1,109 +1,79 @@
 import React, { useState } from "react";
 import PopupWithForm from "./PopupWithForm.js";
+import Input from "./Input.js";
 
-function AddPlacePopup({ isOpen, onClose, onAddPlace }) {
-  const [name, setName] = useState("");
-  const [link, setLink] = useState("");
-  const [nameError, setNameError] = useState("");
-  const [linkError, setLinkError] = useState("");
+function AddPlacePopup({ isOpen, onClose, onAddPlaceSubmit }) {
+  const [placeName, setPlaceName] = useState("");
+  const [placeLink, setPlaceLink] = useState("");
 
-  function isValidURL(url) {
-    try {
-      new URL(url);
-      return true;
-    } catch (error) {
-      return false;
-    }
-  }
+  const handlePlaceNameChange = (evt) => {
+    setPlaceName(evt.target.value);
+  };
 
-  function handleAddPlaceSubmit(e) {
-    e.preventDefault();
+  const handlePlaceLinkChange = (evt) => {
+    setPlaceLink(evt.target.value);
+  };
 
-    if (!name) {
-      setNameError("Por favor ingresa un título.");
+  const handleCleanInputOnClose = () => {
+    onClose();
+    setPlaceLink("");
+    setPlaceName("");
+  };
+
+  const handleSubmit = () => {
+    if (!placeName || !placeLink) {
+      alert("Campo requerido");
       return;
     }
 
-    if (name.length < 2) {
-      setNameError("El título debe tener al menos 2 caracteres.");
+    const imageRegex = /\.(jpeg|jpg|gif|png|bmp|svg|webp)$/i;
+
+    if (!imageRegex.test(placeLink)) {
+      alert("La URL no es una URL de imagen válida");
       return;
     }
 
-    if (!link) {
-      setLinkError("Por favor ingresa un enlace.");
-      return;
-    }
-
-    if (link.length < 2) {
-      setLinkError("El enlace debe tener al menos 2 caracteres.");
-      return;
-    }
-
-    if (!isValidURL(link)) {
-      setLinkError("Por favor ingresa una URL válida.");
-      return;
-    }
-
-    // Si todos los campos son válidos, llama a la función onAddPlace
-    onAddPlace({ name, link });
-  }
-
-  function handleOnChange(evt) {
-    const { name, value } = evt.target;
-    if (name === "name") {
-      setName(value);
-      setNameError("");
-    } else {
-      setLink(value);
-      setLinkError("");
-    }
-  }
-
+    onAddPlaceSubmit({
+      name: placeName,
+      link: placeLink,
+    }).then(() => {
+      setPlaceName("");
+      setPlaceLink("");
+      onClose();
+    });
+  };
   return (
     <PopupWithForm
-      isOpen={isOpen}
-      name={"place"}
       title={"Nuevo Lugar"}
-      onClose={onClose}
+      className="popup"
+      id="add-picture-form"
+      nameBtn="Guardar"
+      isOpen={isOpen}
+      onClose={handleCleanInputOnClose}
+      onSubmit={handleSubmit}
     >
-      <form
-        id="form-place"
-        className="form"
-        onSubmit={handleAddPlaceSubmit}
-        noValidate
+      <Input
+        type="text"
+        className="popup__container-input"
+        placeholder="Título"
+        id="title-place"
+        maxLength="30"
+        value={placeName}
+        onChange={handlePlaceNameChange}
       >
-        <input
-          className="form__user-box"
-          id="place-title"
-          type="text"
-          placeholder="Título"
-          minLength="2"
-          maxLength="30"
-          name="name"
-          value={name}
-          onChange={handleOnChange}
-          required
-        />
-        <span className="place-title-error">{nameError}</span>
-        <input
-          className="form__user-box"
-          id="place-link"
-          type="url"
-          placeholder="Enlace a la imagen"
-          name="link"
-          value={link}
-          onChange={handleOnChange}
-          required
-        />
-        <span className="place-link-error">{linkError}</span>
-        <button
-          type="submit"
-          className="form__button-submit"
-          disabled={!!nameError || !!linkError}
-        >
-          Crear
-        </button>
-      </form>
+        <span className="popup__input-error title-place-error"></span>
+      </Input>
+
+      <Input
+        type="url"
+        className="popup__container-input"
+        placeholder="Enlace a la imagen"
+        id="new-image"
+        value={placeLink}
+        onChange={handlePlaceLinkChange}
+      >
+        <span className="popup__input-error name-error"></span>
+      </Input>
     </PopupWithForm>
   );
 }

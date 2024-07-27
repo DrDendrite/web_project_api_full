@@ -1,15 +1,15 @@
 {
-  "name": "web_project_around_react",
+  "name": "web_project_around_auth",
+  "homepage": "https://www.dendriteprojectaround.ignorelist.com",
   "version": "0.1.0",
   "private": true,
-  "homepage": "",
   "dependencies": {
     "@testing-library/jest-dom": "^5.17.0",
     "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^13.5.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "react-router-dom": "^6.23.1",
+    "react-router-dom": "^6.21.2",
     "react-scripts": "5.0.1",
     "web-vitals": "^2.1.4"
   },
@@ -19,8 +19,7 @@
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "predeploy": "npm run build",
-    "deploy": "gh-pages -d build",
-    "dev": "nodemon app.js"
+    "deploy": "npm run build && scp -r ./build/* ctpineda1@34.68.227.116:/home/ctpineda1/web_project_api_full/frontend"
   },
   "eslintConfig": {
     "extends": [
@@ -41,16 +40,6 @@
     ]
   },
   "devDependencies": {
-    "gh-pages": "^6.1.1",
-    "nodemon": "^3.1.2",
-    "@babel/plugin-proposal-private-property-in-object": "^7.21.11",
-    "cross-env": "^7.0.3",
-    "eslint-config-airbnb": "^19.0.4",
-    "eslint-config-airbnb-base": "^15.0.0",
-    "eslint-plugin-import": "^2.29.1",
-    "eslint-plugin-jsx-a11y": "^6.8.0",
-    "eslint-plugin-react": "^7.33.2",
-    "eslint-plugin-react-hooks": "^4.6.0",
-    "svg-inline-loader": "^0.8.2"
+    "gh-pages": "^6.0.0"
   }
 }
