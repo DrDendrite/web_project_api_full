@@ -1,4 +1,4 @@
-const BASE_URL = "https://api.dendriteprojectaround.ignorelist.com";
+const BASE_URL = "https://api.dendritearound.ignorelist.com";
 // const BASE_URL = "http://localhost:3000";
 
 export const register = (password, email) => {
