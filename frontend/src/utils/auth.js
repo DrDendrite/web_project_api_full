@@ -1,5 +1,5 @@
-const BASE_URL = "https://api.dendritearound.ignorelist.com";
-// const BASE_URL = "http://localhost:3000";
+//const BASE_URL = "https://api.arounddendrite.crabdance.com";
+const BASE_URL = "http://localhost:3000";
 
 export const register = (password, email) => {
   return fetch(`${BASE_URL}/signup`, {
