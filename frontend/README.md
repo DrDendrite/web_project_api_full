@@ -16,4 +16,3 @@ Este proyecto presenta varios retos, ya que implementamos la funcionalidad de la
 - Media Queries
 - Flexbox
 - Metodología BEM 
-
